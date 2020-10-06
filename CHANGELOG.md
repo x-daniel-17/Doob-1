@@ -1,4 +1,12 @@
-## v2.0.8
+## v2.0.9 - The Overwatch Update!
+* Added `doob/owstats` and `doob/setowprofile`
+    - `doob/owstats` grabs your stats from [Tracker.gg](https://tracker.gg)
+    - `doob/setowprofile` sets your usernamd and platform for where you play Overwatch
+        - Usage - `doob/setowprofile {platform} {username}`
+            - Platforms:
+                - battlenet, xbl, psn
+
+## v2.0.8 - The ((BIG UPDATE))
 * Updated description (on the help command) for
     - `doob/Leaderboard`
 * New `doob/patreon` command!
