@@ -23,7 +23,7 @@ class gamestats(Cog):
 		platformUserIdentifier = db.record("SELECT OverwatchUsername FROM exp WHERE UserID = ?", target.id)
 		URL = f"https://public-api.tracker.gg/v2/overwatch/standard/profile/{platform}/{platformUserIdentifier}"
 
-		async with request("GET", URL, headers={self.token}) as response:
+		async with request("GET", URL, headers={'TRN-Api-Key': self.token}) as response:
 			if response.status == 200:
 				data = await response.json()
 				embed = Embed(title=f"{ctx.author}'s Overwatch Stats!", description="Sourced from [Tracker.gg](https://tracker.gg)", colour=ctx.author.colour)
@@ -36,6 +36,7 @@ class gamestats(Cog):
 				embed.set_footer(text=f"{ctx.author} requested this fact!", icon_url=ctx.author.avatar_url)
 				await ctx.send(embed=embed)
 			else:
+				print(await response.json())
 				await ctx.send(f"Overwatch stats [Tracker.gg] API sent a {response.status} status.")
 
 	@command(name="setowprofile", aliases=["setow", "owset", "setoverwatch"], brief="Sets your Overwatch profile.")
@@ -90,7 +91,7 @@ class gamestats(Cog):
 
 			await ctx.send(embed=embed)
 
-	@command(name="csgostats", aliases=["csgo", "csstats", "cstats", "csgoprofile"])
+	@command(name="csgostats", aliases=["csgo", "csstats", "cstats", "csgoprofile", "cs"])
 	@cooldown(1, 5, BucketType.user)
 	async def csgo_stats(self, ctx, target: Optional[Member]):
 		"""Gets your CSGO stats from tracker.gg!\nSet your CSGO profile by doing `doob/setcsgoprofile {username}`"""
