@@ -90,6 +90,45 @@ class gamestats(Cog):
 
 			await ctx.send(embed=embed)
 
+	@command(name="csgostats", aliases=["csgo", "csstats", "cstats", "csgoprofile"])
+	@cooldown(1, 5, BucketType.user)
+	async def csgo_stats(self, ctx, target: Optional[Member]):
+		"""Gets your CSGO stats from tracker.gg!\nSet your CSGO profile by doing `doob/setcsgoprofile {username}`"""
+		target = target or ctx.author
+		platformUserIdentifier =  db.record("SELECT CSGOUsername FROM exp WHERE UserID = ?", target.id)
+		URL = f"https://public-api.tracker.gg/v2/csgo/standard/profile/steam/{platformUserIdentifier}"
+
+		async with request("GET", URL, headers={'TRN-Api-Key': self.token}) as response:
+			if response.status == 200:
+				data = await response.json()
+				embed = Embed(title=f"{ctx.author}'s CSGO Stats!", description="Sourced from [Tracker.gg](https://tracker.gg)", colour=ctx.author.colour)
+				
+				fields = ["Time Played", 'GAMING', False]
+
+				print(data["data"]["segments"]["timePlayed"]["displayValue"])
+
+				for name, value, inline in fields:
+					embed.add_field(name=name, value=value, inline=inline)
+
+				embed.set_footer(text=f"{ctx.author} requested this fact!", icon_url=ctx.author.avatar_url)
+				await ctx.send(embed=embed)
+			else:
+				print(await response.json())
+				await ctx.send(f"CSGO stats [Tracker.gg] API sent a {response.status} status.")
+
+	@command(name="setcsgoprofile", aliases=["setcs", "csset", "setcsgo"], brief="Sets your CSGO profile.")
+	@cooldown(1, 5, BucketType.user)
+	async def set_csgo_profile(self, ctx, *, username: Optional[str]):
+		"""Sets your CSGO username for `doob/csgostats`"""
+		embed=Embed(title="Setting CSGO Profile:", description=f"{ctx.author}", colour=ctx.author.colour)
+
+		embed.add_field(name="Steam Username", value=username)
+		embed.set_thumbnail(url=ctx.author.avatar_url)
+
+		db.execute("UPDATE exp SET CSGOUsername = ? WHERE UserID = ?", username, ctx.author.id)
+		db.commit()
+
+		await ctx.send(embed=embed)
 
 	@Cog.listener()
 	async def on_ready(self):
